@@ -1,10 +1,10 @@
 # Resizing Images with Lambda@Edge using the Custom Origin
 
-You can resize the images and convert the image format by query parameters. This Lambda@Edge sample code using the custom origin as the original image source.
+You can  the images and convert the image format by query parameters. This Lambda@Edge sample code using the custom origin as the original image source.
 
 ## Architecture
 
-![Architecture](/images/image-resizing.png)
+![Architecture](architecture.png)
 
 The Lambda@Edge function gets invoked only when there's a cache-miss. 
 1. Derive the custom origin name from the origin defined for the CloudFront distribution.
@@ -20,48 +20,44 @@ The Lambda@Edge function gets invoked only when there's a cache-miss.
 
 ## Deployment
 
+switch to nodejs v20
+```
+nvm use 20
+```
 Install dependencies
 ```
 npm install
 ```
 Install [Sharp](https://sharp.pixelplumbing.com/) for Lambda@Edge
 ```
-cd resources
-npm install --arch=x64 --platform=linux sharp
+npm run build
 ```
 Go back to the root and run bootstrap the AWS CDK
 ```
-npx cdk bootstrap --region us-east-1 -c originName={Origin domain}
+npx cdk bootstrap --region ap-southeast-1 -c originName=[your_bucket_name].s3.ap-southeast-1.amazonaws.com
 ```
 Deploy the stack
 ```
-npx cdk deploy -c originName={Origin domain}
+npx cdk deploy ImageResizeStack -c originName=[your_bucket_name].s3.ap-southeast-1.amazonaws.com
 ```
 You can find the new CloudFront distribution once the deployment is successful. Please check the distribution settings and access the URL with the parameters below.
 
 ## Query Parameters
 Resize and convert JPEG (*.jpg) images based on the query string parameters:
-* width  : pixels (auto-scale the height to match the width)
-* format : jpg or webp
+* width: pixels (auto-scale the height to match the width)
+* format: jpg or webp
 
-Example-1 : Change width to 240 pixel while format keeps jpeg format (need format parameter even though no format change)
+Example 1: Change width to pixel 240 while a format keeps jpeg format
+(need format parameter even though no format change)
 
 `https://dxxxxx.cloudfront.net/image/test.jpg?width=240&format=jpg`
 
-Example-2 : Change width to 360 pixel and convert to webp format
+Example 2: Change width to pixel 360 and convert to webp format
 
 `https://dxxxxx.cloudfront.net/image/test.jpg?width=360&format=webp`
 
 ## Cleanup
-You will need to [manually delete the Lamnbda@Edge function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) (CdkImageConverterStack-) then remove the stack with:
+You will need to [manually delete the Lamnbda@Edge function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) (ImageResizeStack-) then remove the stack with:
 ```
-npx cdk destroy -c originName={Origin domain}
+npx cdk destroy ImageResizeStack -c originName={Origin domain}
 ```
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
-## License
-
-This library is licensed under the MIT-0 License. See the LICENSE file.

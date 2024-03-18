@@ -5,7 +5,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 
-export class CdkImageConverterStack extends Stack {
+export class ImageResizeStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
     
@@ -14,23 +14,24 @@ export class CdkImageConverterStack extends Stack {
       throw new Error('Context value [originName] is not set')
     }
 
-    const ImageConverterFunction  = new cloudfront.experimental.EdgeFunction(
+    const ImageResizeFunction  = new cloudfront.experimental.EdgeFunction(
       this,
-      'ImageConverter',
+      'ImageResize',
       {
         code: lambda.Code.fromAsset(
           path.join(__dirname, '../resources')
         ),
+        // functionName: "image-resize-edge-function",
         handler: 'index.handler',
-        runtime: lambda.Runtime.NODEJS_18_X,
+        runtime: lambda.Runtime.NODEJS_20_X,
         memorySize: 512,
         timeout: Duration.seconds(10),
       }
     );
 
-    const myCachePolicy = new cloudfront.CachePolicy(this, 'myCachePolicy', {
-      cachePolicyName: 'ImageConvert',
-      comment: 'Cache Policy for Image-convert',
+    const cachePolicy = new cloudfront.CachePolicy(this, 'cachePolicy', {
+      cachePolicyName: 'ImageResize',
+      comment: 'Cache Policy for Image-resize',
       queryStringBehavior: cloudfront.CacheQueryStringBehavior.allowList('width', 'format'),
       defaultTtl: Duration.days(30),
       minTtl: Duration.days(1),
@@ -40,13 +41,13 @@ export class CdkImageConverterStack extends Stack {
       defaultBehavior: {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
-        cachePolicy: myCachePolicy,
+        cachePolicy: cachePolicy,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         origin: new origins.HttpOrigin(originName),
         edgeLambdas: [
           {
             eventType: cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
-            functionVersion: ImageConverterFunction.currentVersion,
+            functionVersion: ImageResizeFunction.currentVersion,
           },
         ],
       },
