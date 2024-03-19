@@ -64,7 +64,7 @@ You will need to [manually delete the Lamnbda@Edge function](https://docs.aws.am
 1. Go to Cloudfront distribution
 2. Select a distribution
 3. Select behavior
-4. Disassociate edge function from Cloudfront
+4. Disassociate edge function from Cloudfront 
 5. Execute this command
 ```
 npx cdk destroy ImageResizeStack[Prod|Staging] -c originName=[your_bucket_name].s3.ap-southeast-1.amazonaws.com
