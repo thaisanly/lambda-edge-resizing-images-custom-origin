@@ -1,6 +1,7 @@
 # Resizing Images with Lambda@Edge using the Custom Origin
 
-You can  the images and convert the image format by query parameters. This Lambda@Edge sample code using the custom origin as the original image source.
+You can the images and convert the image format by query parameters.
+This Lambda@Edge sample code using the custom origin as the original image source.
 
 ## Architecture
 
@@ -45,10 +46,11 @@ You can find the new CloudFront distribution once the deployment is successful. 
 ## Query Parameters
 Resize and convert JPEG (*.jpg) images based on the query string parameters:
 * width: pixels (auto-scale the height to match the width)
-* format: jpg or webp
+* height: pixels (optional)
+* format: default jpg or webp (optional)
 
 Example 1: Change width to pixel 240 while a format keeps jpeg format
-(need format parameter even though no format change)
+(need format parameter even though no format changes)
 
 `https://dxxxxx.cloudfront.net/image/test.jpg?width=240&format=jpg`
 
