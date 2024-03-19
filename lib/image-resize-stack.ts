@@ -6,22 +6,23 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 
 export class ImageResizeStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, suffix?: string, props?: StackProps) {
     super(scope, id, props);
-    
+
     const originName = this.node.tryGetContext('originName') as string
+
     if (originName == undefined) {
       throw new Error('Context value [originName] is not set')
     }
 
     const ImageResizeFunction  = new cloudfront.experimental.EdgeFunction(
       this,
-      'ImageResize',
+        this.getResourceName('ImageResize', suffix),
       {
         code: lambda.Code.fromAsset(
           path.join(__dirname, '../resources')
         ),
-        // functionName: "image-resize-edge-function",
+        functionName: this.getResourceName("CloudfrontImageResize", suffix),
         handler: 'index.handler',
         runtime: lambda.Runtime.NODEJS_20_X,
         memorySize: 512,
@@ -29,15 +30,15 @@ export class ImageResizeStack extends Stack {
       }
     );
 
-    const cachePolicy = new cloudfront.CachePolicy(this, 'cachePolicy', {
-      cachePolicyName: 'ImageResize',
+    const cachePolicy = new cloudfront.CachePolicy(this, this.getResourceName('CachePolicy', suffix), {
+      cachePolicyName: this.getResourceName('ImageResize', suffix),
       comment: 'Cache Policy for Image-resize',
       queryStringBehavior: cloudfront.CacheQueryStringBehavior.allowList('width', 'height', 'format'),
       defaultTtl: Duration.days(30),
       minTtl: Duration.days(1),
     });
 
-    const distribution = new cloudfront.Distribution(this, 'Distribution', {
+    new cloudfront.Distribution(this, this.getResourceName('Distribution', suffix), {
       defaultBehavior: {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
@@ -52,5 +53,14 @@ export class ImageResizeStack extends Stack {
         ],
       },
     });
+  }
+
+  getResourceName(name: string, suffix?: string): string
+  {
+    if (suffix) {
+      return name + suffix.charAt(0).toUpperCase() + suffix.slice(1)
+    }
+
+    return name;
   }
 }
