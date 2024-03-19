@@ -39,6 +39,7 @@ export class ImageResizeStack extends Stack {
     });
 
     new cloudfront.Distribution(this, this.getResourceName('Distribution', suffix), {
+      comment: this.getResourceName('CloudfrontImageResize', suffix),
       defaultBehavior: {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
