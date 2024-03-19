@@ -39,6 +39,8 @@ exports.handler = (event, context, callback) => {
   const height = params.has('height') ? parseInt(params.get('height'), 10) : null;
   const format = params.has('format') ? params.get('format') : 'jpg';
 
+  console.log(request, width, height, format);
+
   /**
    * request validation if fail just pass the request
    */
@@ -47,12 +49,12 @@ exports.handler = (event, context, callback) => {
     return;
   }
 
-  if (width && width > (MAX_WIDTH || width < MIN_WIDTH)) {
+  if (width && (width > MAX_WIDTH || width < MIN_WIDTH)) {
     callback(null, request);
     return;
   }
 
-  if (height && (height > MAX_HEIGHT || width < MIN_WIDTH)) {
+  if (height && (height > MAX_HEIGHT || height < MIN_HEIGHT)) {
     callback(null, request);
     return;
   }

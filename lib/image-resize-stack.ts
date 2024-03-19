@@ -32,7 +32,7 @@ export class ImageResizeStack extends Stack {
     const cachePolicy = new cloudfront.CachePolicy(this, 'cachePolicy', {
       cachePolicyName: 'ImageResize',
       comment: 'Cache Policy for Image-resize',
-      queryStringBehavior: cloudfront.CacheQueryStringBehavior.allowList('width', 'format'),
+      queryStringBehavior: cloudfront.CacheQueryStringBehavior.allowList('width', 'height', 'format'),
       defaultTtl: Duration.days(30),
       minTtl: Duration.days(1),
     });
