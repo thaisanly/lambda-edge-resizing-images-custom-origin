@@ -7,7 +7,7 @@ This Lambda@Edge sample code using the custom origin as the original image sourc
 
 ![Architecture](architecture.png)
 
-The Lambda@Edge function gets invoked only when there's a cache-miss. 
+The Lambda@Edge function gets invoked only when there's a cache-miss.
 1. Derive the custom origin name from the origin defined for the CloudFront distribution.
 2. Parse the image width and format needed from the querystring.
 3. Using the request URI fetch the original image into buffer using the Node.js HTTP module.
@@ -39,7 +39,7 @@ npx cdk bootstrap --region ap-southeast-1 -c originName=[your_bucket_name].s3.ap
 ```
 Deploy the stack
 ```
-npx cdk deploy ImageResizeStack -c originName=[your_bucket_name].s3.ap-southeast-1.amazonaws.com
+npx cdk deploy ImageResizeStack[Prod|Staging] -c originName=[your_bucket_name].s3.ap-southeast-1.amazonaws.com
 ```
 You can find the new CloudFront distribution once the deployment is successful. Please check the distribution settings and access the URL with the parameters below.
 
@@ -47,7 +47,7 @@ You can find the new CloudFront distribution once the deployment is successful. 
 Resize and convert JPEG (*.jpg) images based on the query string parameters:
 * width: pixels (auto-scale the height to match the width)
 * height: pixels (optional)
-* format: default jpg or webp (optional)
+* format: jpg or webp (optional default jpg)
 
 Example 1: Change width to pixel 240 while a format keeps jpeg format
 (need format parameter even though no format changes)
@@ -59,7 +59,13 @@ Example 2: Change width to pixel 360 and convert to webp format
 `https://dxxxxx.cloudfront.net/image/test.jpg?width=360&format=webp`
 
 ## Cleanup
-You will need to [manually delete the Lamnbda@Edge function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) (ImageResizeStack-) then remove the stack with:
+You will need to [manually delete the Lamnbda@Edge function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) (ImageResizeStack[Prod|Staging]) then remove the stack with:
+
+1. Go to Cloudfront distribution
+2. Select a distribution
+3. Select behavior
+4. Disassociate edge function from Cloudfront
+5. Execute this command
 ```
-npx cdk destroy ImageResizeStack -c originName={Origin domain}
+npx cdk destroy ImageResizeStack[Prod|Staging] -c originName=[your_bucket_name].s3.ap-southeast-1.amazonaws.com
 ```
